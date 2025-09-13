@@ -19,28 +19,40 @@ fn main() {
         let command = parts.next().unwrap();
         let args = parts;
 
-        //Close shell 
-        if command == "quit" {
-            break; // exit the loop
-        }
 
-        match command{
+
+        match command {
+            // Handle the built-in "cd" (change directory) command
             "cd" => {
-                // default to '/' as new directory if one was not provided
+                // If no argument is given, default to "/" (root directory).
+                // Otherwise, take the first argument from `args`.
                 let new_dir = args.peekable().peek().map_or("/", |x| *x);
-                let root = Path::new(new_dir);
-                if let Err(e) = env::set_current_dir(&root) {
-                    eprintln!("{}", e);               
-            }
-        },
-        command => {
-                let mut child = Command::new(command)
-                    .args(args)
-                    .spawn()
-                    .unwrap();
 
-                child.wait();            
+                // Create a Path object from the new directory string
+                let root = Path::new(new_dir);
+
+                // Try to change the current working directory.
+                // If it fails (e.g., directory doesn’t exist), print the error.
+                if let Err(e) = env::set_current_dir(&root) {
+                    eprintln!("{}", e);
+                }
+            },
+            "quit" => return,       //quit terminal command
+
+            // Handle all other commands (external programs like `ls`, `pwd`, etc.)
+            command => {
+                // Spawn a new child process for the given command,
+                // passing along any arguments collected in `args`.
+                let child = Command::new(command)
+                    .args(args)
+                    .spawn();
+                // gracefully handle malformed user input
+                match child {
+                    Ok(mut child) => { child.wait(); },
+                    Err(e) => eprintln!("{}", e),
+                };
             }
         }
+
     }
 }
