@@ -2,12 +2,17 @@ use std::io::{stdin, stdout, Write};
 use std::process::{Command, Stdio, Child};
 use std::env;
 use std::path::Path;
+use colored::*;
 
 fn main() {
     loop {
+        //Get the current working directory 
+        let cwd = env::current_dir().unwrap(); // returns a PathBuf
+        let cwd_str = cwd.to_str().unwrap();   // convert to &str
         // Print a shell prompt
-        print!("> ");
+        print!("{}{} ", cwd_str.yellow(), " > ".green().bold());
         stdout().flush().unwrap(); // flush to ensure prompt shows immediately
+
 
         // Read a line of input from the user
         let mut input = String::new();
@@ -43,8 +48,9 @@ fn main() {
                     previous_command = None;
                 },
 
-                // Handle built-in "quit" command to exit shell
+                // Handle built-in "quit" or "exit" command to exit shell
                 "quit" => return,
+                "exit" => return,
 
                 // For all other commands, attempt to execute them
                 command => {
