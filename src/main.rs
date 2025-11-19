@@ -11,7 +11,7 @@ fn main() {
         let cwd_str = cwd.to_str().unwrap();   // convert to &str
         // Print a shell prompt
         print!("{}{} ", cwd_str.yellow(), " > ".green().bold());
-        stdout().flush().unwrap(); // flush to ensure prompt shows immediately
+        stdout().flush().unwrap(); // flush to ensure prompt appears immediately
 
 
         // Read a line of input from the user
